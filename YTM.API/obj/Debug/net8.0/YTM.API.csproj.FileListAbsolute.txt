@@ -1,3 +1,11 @@
+C:\Users\owner\Desktop\YTM\YTM.API\obj\Debug\net8.0\YTM.API.csproj.AssemblyReference.cache
+C:\Users\owner\Desktop\YTM\YTM.API\obj\Debug\net8.0\YTM.API.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\owner\Desktop\YTM\YTM.API\obj\Debug\net8.0\YTM.API.AssemblyInfoInputs.cache
+C:\Users\owner\Desktop\YTM\YTM.API\obj\Debug\net8.0\YTM.API.AssemblyInfo.cs
+C:\Users\owner\Desktop\YTM\YTM.API\obj\Debug\net8.0\YTM.API.csproj.CoreCompileInputs.cache
+C:\Users\owner\Desktop\YTM\YTM.API\obj\Debug\net8.0\YTM.API.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\owner\Desktop\YTM\YTM.API\obj\Debug\net8.0\YTM.API.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\owner\Desktop\YTM\YTM.API\obj\Debug\net8.0\YTM.API.sourcelink.json
 C:\Users\owner\Desktop\YTM\YTM.API\bin\Debug\net8.0\appsettings.Development.json
 C:\Users\owner\Desktop\YTM\YTM.API\bin\Debug\net8.0\appsettings.json
 C:\Users\owner\Desktop\YTM\YTM.API\bin\Debug\net8.0\YTM.API.staticwebassets.runtime.json
@@ -33,14 +41,6 @@ C:\Users\owner\Desktop\YTM\YTM.API\bin\Debug\net8.0\YTM.Service.dll
 C:\Users\owner\Desktop\YTM\YTM.API\bin\Debug\net8.0\YTM.Core.pdb
 C:\Users\owner\Desktop\YTM\YTM.API\bin\Debug\net8.0\YTM.Service.pdb
 C:\Users\owner\Desktop\YTM\YTM.API\bin\Debug\net8.0\YTM.Data.pdb
-C:\Users\owner\Desktop\YTM\YTM.API\obj\Debug\net8.0\YTM.API.csproj.AssemblyReference.cache
-C:\Users\owner\Desktop\YTM\YTM.API\obj\Debug\net8.0\YTM.API.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\owner\Desktop\YTM\YTM.API\obj\Debug\net8.0\YTM.API.AssemblyInfoInputs.cache
-C:\Users\owner\Desktop\YTM\YTM.API\obj\Debug\net8.0\YTM.API.AssemblyInfo.cs
-C:\Users\owner\Desktop\YTM\YTM.API\obj\Debug\net8.0\YTM.API.csproj.CoreCompileInputs.cache
-C:\Users\owner\Desktop\YTM\YTM.API\obj\Debug\net8.0\YTM.API.MvcApplicationPartsAssemblyInfo.cs
-C:\Users\owner\Desktop\YTM\YTM.API\obj\Debug\net8.0\YTM.API.MvcApplicationPartsAssemblyInfo.cache
-C:\Users\owner\Desktop\YTM\YTM.API\obj\Debug\net8.0\YTM.API.sourcelink.json
 C:\Users\owner\Desktop\YTM\YTM.API\obj\Debug\net8.0\scopedcss\bundle\YTM.API.styles.css
 C:\Users\owner\Desktop\YTM\YTM.API\obj\Debug\net8.0\staticwebassets.build.json
 C:\Users\owner\Desktop\YTM\YTM.API\obj\Debug\net8.0\staticwebassets.development.json

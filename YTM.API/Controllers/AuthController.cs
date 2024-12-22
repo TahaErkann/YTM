@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using YTM.Core.Entities;
 using YTM.Core.Services;
+using BCrypt.Net;
 
 namespace YTM.API.Controllers
 {
@@ -40,7 +41,7 @@ namespace YTM.API.Controllers
                 {
                     Email = model.Email,
                     Password = BCrypt.Net.BCrypt.HashPassword(model.Password),
-                    Role = "Customer"  // Varsayılan rol
+                    Role = "Customer"
                 };
 
                 await _userService.CreateUserAsync(user);
@@ -84,6 +85,11 @@ namespace YTM.API.Controllers
 
         private string GenerateJwtToken(User user)
         {
+            if (user.Id == null)
+            {
+                throw new ArgumentException("User ID cannot be null");
+            }
+
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"] ?? throw new InvalidOperationException()));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
@@ -91,7 +97,7 @@ namespace YTM.API.Controllers
             {
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.Role),
-                new Claim("UserId", user.Id ?? "")
+                new Claim("UserId", user.Id)
             };
 
             var token = new JwtSecurityToken(

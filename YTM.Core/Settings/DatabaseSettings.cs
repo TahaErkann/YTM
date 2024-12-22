@@ -6,5 +6,6 @@ namespace YTM.Core.Settings
         public string DatabaseName { get; set; } = null!;
         public string UsersCollectionName { get; set; } = null!;
         public string ProductsCollectionName { get; set; } = null!;
+        public string CartsCollectionName { get; set; } = null!;
     }
 } 
