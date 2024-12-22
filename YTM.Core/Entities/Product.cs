@@ -10,25 +10,25 @@ namespace YTM.Core.Entities
         public string? Id { get; set; }
 
         [BsonElement("Name")]
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; set; } = null!;
 
         [BsonElement("Description")]
-        public string Description { get; set; } = string.Empty;
+        public string? Description { get; set; }
 
         [BsonElement("Price")]
         [BsonRepresentation(BsonType.Decimal128)]
         public decimal Price { get; set; }
 
         [BsonElement("Brand")]
-        public string Brand { get; set; } = string.Empty;
+        public string? Brand { get; set; }
 
         [BsonElement("ImageUrl")]
-        public string ImageUrl { get; set; } = string.Empty;
+        public string? ImageUrl { get; set; }
 
         [BsonElement("Stock")]
         public int Stock { get; set; }
 
         [BsonElement("IsActive")]
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
     }
 } 

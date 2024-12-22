@@ -10,15 +10,15 @@ namespace YTM.Core.Entities
         public string? Id { get; set; }
 
         [BsonElement("Email")]
-        public string Email { get; set; } = string.Empty;
+        public string Email { get; set; } = null!;
 
         [BsonElement("Password")]
-        public string Password { get; set; } = string.Empty;
+        public string Password { get; set; } = null!;
 
         [BsonElement("Role")]
-        public string Role { get; set; } = string.Empty;
+        public string Role { get; set; } = "Customer";
 
-        [BsonElement("CreatedDate")]
-        public DateTime CreatedDate { get; set; }
+        [BsonElement("isActive")]
+        public bool IsActive { get; set; } = true;
     }
 } 

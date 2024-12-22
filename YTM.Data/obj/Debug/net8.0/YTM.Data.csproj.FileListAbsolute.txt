@@ -8,6 +8,7 @@ C:\Users\owner\Desktop\YTM\YTM.Data\obj\Debug\net8.0\YTM.Data.GeneratedMSBuildEd
 C:\Users\owner\Desktop\YTM\YTM.Data\obj\Debug\net8.0\YTM.Data.AssemblyInfoInputs.cache
 C:\Users\owner\Desktop\YTM\YTM.Data\obj\Debug\net8.0\YTM.Data.AssemblyInfo.cs
 C:\Users\owner\Desktop\YTM\YTM.Data\obj\Debug\net8.0\YTM.Data.csproj.CoreCompileInputs.cache
+C:\Users\owner\Desktop\YTM\YTM.Data\obj\Debug\net8.0\YTM.Data.sourcelink.json
 C:\Users\owner\Desktop\YTM\YTM.Data\obj\Debug\net8.0\YTM.Data.csproj.Up2Date
 C:\Users\owner\Desktop\YTM\YTM.Data\obj\Debug\net8.0\YTM.Data.dll
 C:\Users\owner\Desktop\YTM\YTM.Data\obj\Debug\net8.0\refint\YTM.Data.dll

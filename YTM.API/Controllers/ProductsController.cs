@@ -23,13 +23,22 @@ namespace YTM.API.Controllers
         {
             try
             {
+                _logger.LogInformation("Getting all products");
                 var products = await _productService.GetAllProductsAsync();
+                
+                if (!products.Any())
+                {
+                    _logger.LogInformation("No products found");
+                    return Ok(new List<Product>()); // Boş liste dön
+                }
+                
+                _logger.LogInformation($"Found {products.Count()} products");
                 return Ok(products);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error getting products: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                _logger.LogError($"Error getting products: {ex}");
+                return StatusCode(500, new { message = "Ürünler yüklenirken bir hata oluştu", error = ex.Message });
             }
         }
 
@@ -38,27 +47,23 @@ namespace YTM.API.Controllers
         {
             try
             {
-                _logger.LogInformation($"Getting product with id: {id}");
                 var product = await _productService.GetProductByIdAsync(id);
-
                 if (product == null)
                 {
-                    _logger.LogWarning($"Product with id {id} not found");
-                    return NotFound();
+                    return NotFound(new { message = "Ürün bulunamadı" });
                 }
-
                 return Ok(product);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error getting product {id}: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                _logger.LogError($"Error getting product: {ex}");
+                return StatusCode(500, new { message = "Ürün yüklenirken bir hata oluştu", error = ex.Message });
             }
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<ActionResult<Product>> CreateProduct([FromBody] Product product)
+        public async Task<ActionResult<Product>> CreateProduct(Product product)
         {
             try
             {
@@ -67,24 +72,29 @@ namespace YTM.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error creating product: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                _logger.LogError($"Error creating product: {ex}");
+                return StatusCode(500, new { message = "Ürün oluşturulurken bir hata oluştu", error = ex.Message });
             }
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProduct(string id, [FromBody] Product product)
+        public async Task<IActionResult> UpdateProduct(string id, Product product)
         {
             try
             {
+                if (id != product.Id)
+                {
+                    return BadRequest(new { message = "ID uyuşmazlığı" });
+                }
+
                 await _productService.UpdateProductAsync(id, product);
                 return NoContent();
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error updating product {id}: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                _logger.LogError($"Error updating product: {ex}");
+                return StatusCode(500, new { message = "Ürün güncellenirken bir hata oluştu", error = ex.Message });
             }
         }
 
@@ -99,8 +109,8 @@ namespace YTM.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error deleting product {id}: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                _logger.LogError($"Error deleting product: {ex}");
+                return StatusCode(500, new { message = "Ürün silinirken bir hata oluştu", error = ex.Message });
             }
         }
     }

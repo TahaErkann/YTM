@@ -6,6 +6,7 @@
     <title>Admin Paneli - YTM Spor</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../css/admin.css">
+    <script src="../js/admin.js" defer></script>
 </head>
 <body>
     <div class="admin-container">
@@ -16,7 +17,7 @@
             </div>
             <ul>
                 <li>
-                    <a href="#" class="active" onclick="showSection('dashboard')">
+                    <a href="#" onclick="showSection('dashboard')">
                         <i class="fas fa-tachometer-alt"></i>
                         <span>Dashboard</span>
                     </a>
@@ -49,6 +50,7 @@
         </nav>
 
         <main class="admin-content">
+            <!-- Dashboard Section -->
             <section id="dashboard" class="content-section">
                 <div class="section-header">
                     <h2>Dashboard</h2>
@@ -85,76 +87,141 @@
                 </div>
             </section>
 
-            <!-- Diğer bölümler buraya eklenecek -->
+            <!-- Products Section -->
+            <section id="products" class="content-section" style="display: none;">
+                <div class="section-header">
+                    <h2>Ürün Yönetimi</h2>
+                    <button class="add-button" onclick="showAddProductModal()">
+                        <i class="fas fa-plus"></i> Yeni Ürün Ekle
+                    </button>
+                </div>
+
+                <div class="products-grid">
+                    <!-- Ürünler buraya dinamik olarak yüklenecek -->
+                </div>
+
+                <!-- Ürün Ekleme/Düzenleme Modal -->
+                <div id="productModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-button" onclick="closeProductModal()">&times;</span>
+                        <h2 id="modalTitle">Yeni Ürün Ekle</h2>
+                        <form id="productForm" onsubmit="handleProductSubmit(event)">
+                            <input type="hidden" id="productId">
+                            <div class="form-group">
+                                <label for="name">Ürün Adı</label>
+                                <input type="text" id="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Açıklama</label>
+                                <textarea id="description" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="price">Fiyat (₺)</label>
+                                <input type="number" id="price" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="brand">Marka</label>
+                                <input type="text" id="brand" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="imageUrl">Resim URL</label>
+                                <input type="url" id="imageUrl" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="stock">Stok</label>
+                                <input type="number" id="stock" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="isActive">Aktif</label>
+                                <input type="checkbox" id="isActive" checked>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="save-button">
+                                    <i class="fas fa-save"></i> Kaydet
+                                </button>
+                                <button type="button" class="cancel-button" onclick="closeProductModal()">
+                                    <i class="fas fa-times"></i> İptal
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Orders Section -->
+            <section id="orders" class="content-section" style="display: none;">
+                <div class="section-header">
+                    <h2>Siparişler</h2>
+                </div>
+                <!-- Sipariş içeriği buraya gelecek -->
+            </section>
+
+            <!-- Users Section -->
+            <section id="users" class="content-section" style="display: none;">
+                <div class="section-header">
+                    <h2>Kullanıcılar</h2>
+                </div>
+                <!-- Kullanıcı içeriği buraya gelecek -->
+            </section>
         </main>
     </div>
 
     <script>
-        // Sayfa yüklendiğinde token kontrolü yap
-        document.addEventListener('DOMContentLoaded', async function() {
+        // Sayfa yüklendiğinde token kontrolü
+        document.addEventListener('DOMContentLoaded', function() {
             const token = localStorage.getItem('token');
-            if (!token) {
+            const userRole = localStorage.getItem('userRole'); // Role bilgisini doğrudan al
+
+            if (!token || !userRole) {
                 window.location.href = '/login.html';
                 return;
             }
-        
-            try {
-                const payload = JSON.parse(atob(token.split('.')[1]));
-                console.log('Token payload:', payload);
-        
-                // Tüm olası rol claim anahtarlarını kontrol et
-                const roleKeys = [
-                    'role',
-                    'http://schemas.microsoft.com/ws/2008/06/identity/claims/role',
-                    'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role'
-                ];
-        
-                const userRole = roleKeys
-                    .map(key => payload[key])
-                    .find(role => role !== undefined);
-        
-                console.log('Found user role:', userRole);
-        
-                if (userRole !== 'Admin') {
-                    console.log('Access denied: Not admin role');
-                    alert('Bu sayfaya erişim yetkiniz yok!');
-                    window.location.href = '/customer/dashboard.html';
-                    return;
-                }
-        
-                // Admin erişimi onaylandı
-                document.querySelector('.admin-container').style.display = 'flex';
-                
-                // Ürünleri yükle
-                await loadProducts();
-                
-            } catch (error) {
-                console.error('Token parsing error:', error);
-                window.location.href = '/login.html';
+
+            if (userRole !== 'Admin') {
+                alert('Bu sayfaya erişim yetkiniz yok!');
+                window.location.href = '/customer/dashboard.html';
+                return;
+            }
+
+            // Admin erişimi onaylandı, içeriği göster
+            document.querySelector('.admin-container').style.display = 'flex';
+            
+            // Varsayılan olarak dashboard'u göster
+            showSection('dashboard');
+            
+            // Ürünleri yükle
+            if (document.querySelector('.products-grid')) {
+                loadProducts();
             }
         });
-        
-        async function loadProducts() {
-            try {
-                const token = localStorage.getItem('token');
-                const response = await fetch('/api/products', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-        
-                if (!response.ok) {
-                    throw new Error('Ürünler yüklenemedi');
+
+        function showSection(sectionId) {
+            // Tüm bölümleri gizle
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Seçilen bölümü göster
+            document.getElementById(sectionId).style.display = 'block';
+
+            // Aktif menü öğesini güncelle
+            document.querySelectorAll('.admin-nav a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('onclick').includes(sectionId)) {
+                    link.classList.add('active');
                 }
-        
-                const products = await response.json();
-                console.log('Products loaded:', products);
-                // Ürünleri görüntüle
-            } catch (error) {
-                console.error('Error loading products:', error);
+            });
+
+            // Eğer ürünler bölümü seçildiyse ürünleri yükle
+            if (sectionId === 'products') {
+                loadProducts();
             }
         }
-        
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        }
     </script>
 </body>
 </html> 

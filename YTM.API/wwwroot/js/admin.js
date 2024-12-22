@@ -1,208 +1,205 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const token = localStorage.getItem('token');
-    if (!token) {
-        window.location.href = '/login.html';
-        return;
+let productModal;
+let deleteModal;
+let selectedProductId;
+
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        await checkAuth();
+        await loadProducts();
+        
+        // Bootstrap modallarını başlat
+        productModal = new bootstrap.Modal(document.getElementById('productModal'));
+        deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    } catch (error) {
+        console.error('Initialization error:', error);
     }
-
-    // Token'dan rol bilgisini al
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    const userRole = payload.role;
-
-    // Admin yetkisi kontrolü
-    if (userRole !== 'Admin') {
-        alert('Bu sayfaya erişim yetkiniz yok!');
-        window.location.href = '/index.html';
-        return;
-    }
-
-    // Admin arayüzünü göster
-    document.querySelector('.admin-container').style.display = 'flex';
-    
-    loadProducts();
-    setupEventListeners();
 });
 
-// Ürün modalını göster
-function showProductModal(product = null) {
-    const modal = document.getElementById('productModal');
-    const form = document.getElementById('productForm');
-    const modalTitle = document.getElementById('modalTitle');
-
-    // Form alanlarını temizle
-    form.reset();
-
-    if (product) {
-        modalTitle.textContent = 'Ürün Düzenle';
-        form.elements.productId.value = product.id;
-        form.elements.productName.value = product.name;
-        form.elements.productDescription.value = product.description;
-        form.elements.productPrice.value = product.price;
-        form.elements.productBrand.value = product.brand;
-        form.elements.productStock.value = product.stock;
-        form.elements.productImage.value = product.imageUrl;
-    } else {
-        modalTitle.textContent = 'Yeni Ürün Ekle';
-        form.elements.productId.value = '';
-    }
-
-    modal.style.display = 'block';
-}
-
-// Ürün kaydetme
-async function handleProductSubmit(event) {
-    event.preventDefault();
-    const form = event.target;
-    const productId = form.elements.productId.value;
-
+async function loadProducts() {
     try {
-        const productData = {
-            name: form.elements.productName.value,
-            description: form.elements.productDescription.value,
-            price: parseFloat(form.elements.productPrice.value),
-            brand: form.elements.productBrand.value,
-            stock: parseInt(form.elements.productStock.value),
-            imageUrl: form.elements.productImage.value
-        };
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/products', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
 
-        if (!productData.name || !productData.price || !productData.stock) {
-            alert('Lütfen zorunlu alanları doldurun!');
-            return;
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        console.log('Gönderilecek veri:', productData);
+        const products = await response.json();
+        displayProducts(products);
+    } catch (error) {
+        console.error('Error loading products:', error);
+        alert('Ürünler yüklenirken bir hata oluştu: ' + error.message);
+    }
+}
+
+function displayProducts(products) {
+    const tableBody = document.getElementById('productsTable');
+    tableBody.innerHTML = '';
+
+    products.forEach(product => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+                <img src="${product.imageUrl || '/images/no-image.png'}" 
+                     class="product-image" 
+                     alt="${product.name}">
+            </td>
+            <td>${product.name}</td>
+            <td>${product.description || '-'}</td>
+            <td>${product.price} ₺</td>
+            <td>${product.brand || '-'}</td>
+            <td>${product.stock}</td>
+            <td>
+                <span class="badge ${product.isActive ? 'bg-success' : 'bg-danger'}">
+                    ${product.isActive ? 'Aktif' : 'Pasif'}
+                </span>
+            </td>
+            <td>
+                <button class="btn btn-sm btn-primary" onclick="showEditProductModal('${product.id}')">
+                    <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="showDeleteModal('${product.id}')">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+function showAddProductModal() {
+    document.getElementById('modalTitle').textContent = 'Yeni Ürün Ekle';
+    document.getElementById('productForm').reset();
+    document.getElementById('productId').value = '';
+    productModal.show();
+}
+
+async function showEditProductModal(id) {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/api/products/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const product = await response.json();
+        
+        document.getElementById('modalTitle').textContent = 'Ürün Düzenle';
+        document.getElementById('productId').value = product.id;
+        document.getElementById('name').value = product.name;
+        document.getElementById('description').value = product.description || '';
+        document.getElementById('price').value = product.price;
+        document.getElementById('brand').value = product.brand || '';
+        document.getElementById('imageUrl').value = product.imageUrl || '';
+        document.getElementById('stock').value = product.stock;
+        document.getElementById('isActive').checked = product.isActive;
+
+        productModal.show();
+    } catch (error) {
+        console.error('Error loading product:', error);
+        alert('Ürün bilgileri yüklenirken bir hata oluştu: ' + error.message);
+    }
+}
+
+async function saveProduct() {
+    try {
+        const token = localStorage.getItem('token');
+        const productId = document.getElementById('productId').value;
+        
+        const productData = {
+            name: document.getElementById('name').value,
+            description: document.getElementById('description').value,
+            price: parseFloat(document.getElementById('price').value),
+            brand: document.getElementById('brand').value,
+            imageUrl: document.getElementById('imageUrl').value,
+            stock: parseInt(document.getElementById('stock').value),
+            isActive: document.getElementById('isActive').checked
+        };
 
         const url = productId ? `/api/products/${productId}` : '/api/products';
         const method = productId ? 'PUT' : 'POST';
 
+        if (productId) {
+            productData.id = productId;
+        }
+
         const response = await fetch(url, {
             method: method,
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(productData)
         });
 
-        console.log('Sunucu yanıtı:', response);
-
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Ürün kaydedilemedi');
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        // Modal'ı kapat
-        document.getElementById('productModal').style.display = 'none';
-        
-        // Ürün listesini güncelle
+        productModal.hide();
         await loadProducts();
-        
-        // Başarı mesajı göster
-        alert(productId ? 'Ürün başarıyla güncellendi!' : 'Yeni ürün başarıyla eklendi!');
-        
-        // Formu temizle
-        form.reset();
+        alert(productId ? 'Ürün başarıyla güncellendi.' : 'Ürün başarıyla eklendi.');
     } catch (error) {
-        console.error('Ürün kaydetme hatası:', error);
+        console.error('Error saving product:', error);
         alert('Ürün kaydedilirken bir hata oluştu: ' + error.message);
     }
 }
 
-// Event listener'ları güncelle
-function setupEventListeners() {
-    // Modal kapatma düğmesi
-    const closeBtn = document.querySelector('.close');
-    if (closeBtn) {
-        closeBtn.onclick = function() {
-            document.getElementById('productModal').style.display = 'none';
-        }
-    }
-
-    // Form submit
-    const productForm = document.getElementById('productForm');
-    if (productForm) {
-        productForm.onsubmit = handleProductSubmit;
-    }
-
-    // Yeni ürün ekleme butonu
-    const addButton = document.querySelector('.add-product-btn');
-    if (addButton) {
-        addButton.onclick = () => showProductModal();
-    }
-
-    // Modal dışına tıklandığında kapatma
-    window.onclick = function(event) {
-        const modal = document.getElementById('productModal');
-        if (event.target == modal) {
-            modal.style.display = 'none';
-        }
-    }
+function showDeleteModal(id) {
+    selectedProductId = id;
+    deleteModal.show();
 }
 
-// Ürün listesini yükleme
-async function loadProducts() {
+async function confirmDelete() {
     try {
-        console.log('Ürünler yükleniyor...');
-        const response = await fetch('/api/products', {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/api/products/${selectedProductId}`, {
+            method: 'DELETE',
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'Authorization': `Bearer ${token}`
             }
         });
 
-        console.log('Sunucu yanıtı:', response);
-
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Ürünler yüklenemedi');
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const products = await response.json();
-        console.log('Yüklenen ürünler:', products);
-
-        if (!Array.isArray(products)) {
-            throw new Error('Sunucudan gelen veri ürün dizisi değil');
-        }
-
-        updateProductList(products);
+        deleteModal.hide();
+        await loadProducts();
+        alert('Ürün başarıyla silindi.');
     } catch (error) {
-        console.error('Ürünler yüklenirken hata:', error);
-        document.getElementById('productList').innerHTML = `
-            <div class="error-message">
-                <p>Ürünler yüklenirken bir hata oluştu</p>
-                <p>Hata detayı: ${error.message}</p>
-                <button onclick="loadProducts()">Tekrar Dene</button>
-            </div>
-        `;
+        console.error('Error deleting product:', error);
+        alert('Ürün silinirken bir hata oluştu: ' + error.message);
     }
 }
 
-// Ürün listesini güncelleme
-function updateProductList(products) {
-    const productList = document.getElementById('productList');
-    
-    if (!products || products.length === 0) {
-        productList.innerHTML = '<p class="no-products">Henüz ürün bulunmamaktadır.</p>';
+function checkAuth() {
+    const token = localStorage.getItem('token');
+    const userRole = localStorage.getItem('userRole');
+
+    if (!token || !userRole) {
+        window.location.replace('/login.html');
         return;
     }
 
-    productList.innerHTML = products.map(product => `
-        <div class="product-item" data-id="${product.id}">
-            <img src="${product.imageUrl || '/images/default-product.jpg'}" 
-                 alt="${product.name}"
-                 onerror="this.src='/images/default-product.jpg'">
-            <h3>${product.name || 'İsimsiz Ürün'}</h3>
-            <p class="description">${product.description || 'Açıklama yok'}</p>
-            <p class="price">Fiyat: ${product.price?.toFixed(2) || 0} TL</p>
-            <p class="stock">Stok: ${product.stock || 0}</p>
-            <p class="brand">Marka: ${product.brand || 'Belirtilmemiş'}</p>
-            <div class="actions">
-                <button onclick="editProduct('${product.id}')" class="edit-btn">
-                    <i class="fas fa-edit"></i> Düzenle
-                </button>
-                <button onclick="confirmDelete('${product.id}')" class="delete-btn">
-                    <i class="fas fa-trash"></i> Sil
-                </button>
-            </div>
-        </div>
-    `).join('');
+    if (userRole !== 'Admin') {
+        alert('Bu sayfaya erişim yetkiniz yok!');
+        window.location.replace('/login.html');
+        return;
+    }
+}
+
+function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userRole');
+    window.location.replace('/login.html');
 }

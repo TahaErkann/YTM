@@ -7,12 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MongoDB.Driver" Version="3.1.0" />
+    <ProjectReference Include="..\YTM.Core\YTM.Core.csproj" />
+    <ProjectReference Include="..\YTM.Data\YTM.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\YTM.Core\YTM.Core.csproj" />
-    <ProjectReference Include="..\YTM.Data\YTM.Data.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+    <PackageReference Include="MongoDB.Driver" Version="3.1.0" />
   </ItemGroup>
 
 </Project>

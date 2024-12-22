@@ -5,6 +5,10 @@
       "PackagePath": "staticwebassets\\admin\\dashboard.html"
     },
     {
+      "Id": "C:\\Users\\owner\\Desktop\\YTM\\YTM.API\\wwwroot\\admin\\index.html",
+      "PackagePath": "staticwebassets\\admin\\index.html"
+    },
+    {
       "Id": "C:\\Users\\owner\\Desktop\\YTM\\YTM.API\\wwwroot\\css\\admin.css",
       "PackagePath": "staticwebassets\\css\\admin.css"
     },
@@ -25,6 +29,10 @@
       "PackagePath": "staticwebassets\\customer\\dashboard.html"
     },
     {
+      "Id": "C:\\Users\\owner\\Desktop\\YTM\\YTM.API\\wwwroot\\customer\\index.html",
+      "PackagePath": "staticwebassets\\customer\\index.html"
+    },
+    {
       "Id": "C:\\Users\\owner\\Desktop\\YTM\\YTM.API\\wwwroot\\index.html",
       "PackagePath": "staticwebassets\\index.html"
     },
@@ -39,6 +47,10 @@
     {
       "Id": "C:\\Users\\owner\\Desktop\\YTM\\YTM.API\\wwwroot\\js\\cart.js",
       "PackagePath": "staticwebassets\\js\\cart.js"
+    },
+    {
+      "Id": "C:\\Users\\owner\\Desktop\\YTM\\YTM.API\\wwwroot\\js\\customer.js",
+      "PackagePath": "staticwebassets\\js\\customer.js"
     },
     {
       "Id": "C:\\Users\\owner\\Desktop\\YTM\\YTM.API\\wwwroot\\js\\filters.js",

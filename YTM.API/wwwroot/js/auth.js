@@ -9,6 +9,18 @@ document.addEventListener('DOMContentLoaded', function() {
     if (registerForm) {
         registerForm.addEventListener('submit', handleRegister);
     }
+
+    const token = localStorage.getItem('token');
+    const userRole = localStorage.getItem('userRole');
+
+    if (token && userRole) {
+        console.log('User already logged in, redirecting...');
+        if (userRole === 'Admin') {
+            window.location.replace('/admin/index.html');
+        } else {
+            window.location.replace('/customer/index.html');
+        }
+    }
 });
 
 async function handleLogin(event) {
@@ -18,7 +30,7 @@ async function handleLogin(event) {
     const password = document.getElementById('password').value;
 
     try {
-        console.log('Login attempt:', { email, password }); // Debug için
+        console.log('Login attempt for:', email);
 
         const response = await fetch('/api/auth/login', {
             method: 'POST',
@@ -28,37 +40,29 @@ async function handleLogin(event) {
             body: JSON.stringify({ email, password })
         });
 
-        console.log('Server response:', response); // Debug için
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Giriş başarısız');
-        }
+        console.log('Response status:', response.status);
 
         const data = await response.json();
-        console.log('Login successful:', data); // Debug için
+        console.log('Response data:', data);
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Giriş başarısız');
+        }
+
+        console.log('Login successful, role:', data.role);
 
         localStorage.setItem('token', data.token);
+        localStorage.setItem('userRole', data.role);
 
-        // Token'dan rol bilgisini al
-        const tokenParts = data.token.split('.');
-        const payload = JSON.parse(atob(tokenParts[1]));
-        console.log('Token payload:', payload); // Debug için
-
-        // Role claim'ini kontrol et
-        const userRole = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
-        console.log('User role:', userRole); // Debug için
-
-        // Role göre yönlendirme
-        if (userRole === 'Admin') {
-            console.log('Redirecting to admin panel...'); // Debug için
-            window.location.href = '/admin/dashboard.html';
+        if (data.role === 'Admin') {
+            console.log('Redirecting to admin panel...');
+            window.location.replace('/admin/index.html');
         } else {
-            console.log('Redirecting to customer panel...'); // Debug için
-            window.location.href = '/customer/dashboard.html';
+            console.log('Redirecting to customer dashboard...');
+            window.location.replace('/customer/index.html');
         }
     } catch (error) {
-        console.error('Login error:', error); // Debug için
+        console.error('Login error:', error);
         alert('Giriş başarısız: ' + error.message);
     }
 }
