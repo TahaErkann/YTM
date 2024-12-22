@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Paneli - YTM Spor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <nav class="admin-nav">
+            <div class="admin-nav-header">
+                <h2>YTM Spor</h2>
+                <p>Admin Paneli</p>
+            </div>
+            <ul>
+                <li>
+                    <a href="#" class="active" onclick="showSection('dashboard')">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showSection('products')">
+                        <i class="fas fa-box"></i>
+                        <span>Ürünler</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showSection('orders')">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Siparişler</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showSection('users')">
+                        <i class="fas fa-users"></i>
+                        <span>Kullanıcılar</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Çıkış Yap</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="admin-content">
+            <section id="dashboard" class="content-section">
+                <div class="section-header">
+                    <h2>Dashboard</h2>
+                </div>
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <i class="fas fa-shopping-cart"></i>
+                        <div class="stat-info">
+                            <h3>Toplam Sipariş</h3>
+                            <p id="totalOrders">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <div class="stat-info">
+                            <h3>Toplam Kullanıcı</h3>
+                            <p id="totalUsers">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-box"></i>
+                        <div class="stat-info">
+                            <h3>Toplam Ürün</h3>
+                            <p id="totalProducts">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <div class="stat-info">
+                            <h3>Toplam Gelir</h3>
+                            <p id="totalRevenue">₺0</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diğer bölümler buraya eklenecek -->
+        </main>
+    </div>
+
+    <script>
+        // Sayfa yüklendiğinde token kontrolü yap
+        document.addEventListener('DOMContentLoaded', async function() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+        
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                console.log('Token payload:', payload);
+        
+                // Tüm olası rol claim anahtarlarını kontrol et
+                const roleKeys = [
+                    'role',
+                    'http://schemas.microsoft.com/ws/2008/06/identity/claims/role',
+                    'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role'
+                ];
+        
+                const userRole = roleKeys
+                    .map(key => payload[key])
+                    .find(role => role !== undefined);
+        
+                console.log('Found user role:', userRole);
+        
+                if (userRole !== 'Admin') {
+                    console.log('Access denied: Not admin role');
+                    alert('Bu sayfaya erişim yetkiniz yok!');
+                    window.location.href = '/customer/dashboard.html';
+                    return;
+                }
+        
+                // Admin erişimi onaylandı
+                document.querySelector('.admin-container').style.display = 'flex';
+                
+                // Ürünleri yükle
+                await loadProducts();
+                
+            } catch (error) {
+                console.error('Token parsing error:', error);
+                window.location.href = '/login.html';
+            }
+        });
+        
+        async function loadProducts() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/products', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+        
+                if (!response.ok) {
+                    throw new Error('Ürünler yüklenemedi');
+                }
+        
+                const products = await response.json();
+                console.log('Products loaded:', products);
+                // Ürünleri görüntüle
+            } catch (error) {
+                console.error('Error loading products:', error);
+            }
+        }
+        
+    </script>
+</body>
+</html> 
